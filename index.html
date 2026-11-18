@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mines AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#101827;color:white;
+  font-family:Arial,sans-serif;text-align:center;
+  padding:25px 15px
+}
+h1{color:#36e6a0;font-size:32px}
+.card{
+  max-width:420px;margin:20px auto;
+  padding:22px;background:#1d293b;
+  border-radius:18px
+}
+select,button{
+  padding:13px;border:0;border-radius:9px;
+  font-size:16px;margin:7px
+}
+button{background:#20c997;color:#071b18;font-weight:bold}
+.board{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:9px;margin:22px auto
+}
+.cell{
+  aspect-ratio:1;background:#34445c;
+  border-radius:9px;display:grid;
+  place-items:center;font-size:23px;font-weight:bold
+}
+.safe{background:#087f5b}
+.mine{background:#b83248}
+.note{color:#b8c5d8;font-size:13px;line-height:1.6}
+#result{color:#36e6a0;font-size:18px}
+</style>
+</head>
+<body>
+<h1>💎 MINES AI</h1>
+<p>Your Mines Game Assistant</p>
+
+<div class="card">
+<h3>Select Number of Mines</h3>
+<select id="mines">
+<option value="3">3 Mines</option>
+<option value="5">5 Mines</option>
+<option value="7">7 Mines</option>
+<option value="10">10 Mines</option>
+<option value="15">15 Mines</option>
+</select>
+
+<div class="board" id="board"></div>
+
+<button onclick="suggest()">✨ Generate Suggestions</button>
+<button onclick="reset()">New Board</button>
+
+<p id="result">Ready to start</p>
+<p class="note">
+Suggestions are random demo selections, not predictions.
+No tool can know hidden mine positions in a fair random game.
+</p>
+</div>
+
+<script>
+let mines=[];
+let revealed=[];
+
+function reset(){
+  let count=Number(document.getElementById("mines").value);
+  mines=[];
+  revealed=[];
+  while(mines.length<count){
+    let n=Math.floor(Math.random()*25);
+    if(!mines.includes(n)) mines.push(n);
+  }
+  draw();
+  document.getElementById("result").textContent="New board ready!";
+}
+
+function draw(){
+  let board=document.getElementById("board");
+  board.innerHTML="";
+  for(let i=0;i<25;i++){
+    let cell=document.createElement("div");
+    cell.className="cell";
+    if(revealed.includes(i)){
+      cell.classList.add(mines.includes(i)?"mine":"safe");
+      cell.textContent=mines.includes(i)?"💣":"💎";
+    }
+    cell.onclick=()=>openCell(i);
+    board.appendChild(cell);
+  }
+}
+
+function openCell(i){
+  if(revealed.includes(i))return;
+  revealed.push(i);
+  draw();
+  document.getElementById("result").textContent=
+    mines.includes(i)?"Mine revealed! Start a new board.":"Safe tile revealed!";
+}
+
+function suggest(){
+  let count=Number(document.getElementById("mines").value);
+  let picks=[];
+  while(picks.length<Math.min(3,25-count)){
+    let n=Math.floor(Math.random()*25);
+    if(!picks.includes(n))picks.push(n);
+  }
+  document.getElementById("result").textContent=
+    "Random demo picks: "+picks.map(n=>n+1).join(", ");
+}
+
+reset();
+</script>
+</body>
+</html>
